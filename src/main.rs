@@ -1,32 +1,46 @@
 use std::io;
 
 fn main() {
+    let tries: usize = 5;
+    let word: String = get_random_word(" ");
+    let mut flags: [usize; 5] = [0, 0, 0, 0, 0]; // 0 - nothing; 1 - contains; 2 - at this place;
+
     println!("WORDLE!");
 
-    let tries: usize = 5;
-    let word: String = "kurwa".to_string();
-    let mut flags: [usize; 5] = [0,0,0,0,0]; // 0 - nothing; 1 - contains; 2 - at this place;
-
     for _ in 0..tries {
-        let mut user_input = String::new();
-        io::stdin().read_line(&mut user_input).expect("ERR");
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("ERR");
 
-        for cn in user_input.chars() {
-            if word.find(cn).is_some() {
-                // println!("Contains!");
-                flags[user_input.find(cn).unwrap()] = 1;
-            }
-            if word.find(cn) == user_input.find(cn) {
-                // println!("At this place!");
-                flags[word.find(cn).unwrap()] = 2;
-            }
+        // Check for win
+        if input.trim() == word.trim() {
+            println!("You win!");
+            return;
         }
 
-        println!("{}", flags_from_str(user_input, flags));
+        // Check for correct char count
+        if input.trim().len() > 5 {
+            continue;
+        }
+
+        // Set flags
+        for c in input.chars() {
+            if word.find(c).is_some() {
+                flags[input.find(c).unwrap()] = 1; // Containing char
+            }
+            if word.find(c) == input.find(c) {
+                flags[word.find(c).unwrap()] = 2; // Char is on point
+            }
+        }
+        println!("{}", string_from_flags(input, flags));
     }
 }
 
-fn flags_from_str(_input: String, flags: [usize; 5]) -> String {
+fn get_random_word(_path: &str) -> String {
+    // TODO - Read from text file and pick random line
+    "abcde".to_string()
+}
+
+fn string_from_flags(_input: String, flags: [usize; 5]) -> String {
     let mut result = String::new();
     for i in 0..flags.len() {
         match flags[i] {
