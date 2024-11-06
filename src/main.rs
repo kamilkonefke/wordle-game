@@ -1,8 +1,10 @@
 use std::io;
 
+use rand::Rng;
+
 fn main() {
     let tries: usize = 5;
-    let word: String = get_random_word(" ");
+    let word: String = get_random_word("words");
     let mut flags: [usize; 5] = [0, 0, 0, 0, 0]; // 0 - nothing; 1 - contains; 2 - at this place;
 
     println!("WORDLE!");
@@ -18,7 +20,7 @@ fn main() {
         }
 
         // Check for correct char count
-        if input.trim().len() > 5 {
+        if input.trim().len() != 5 {
             continue;
         }
 
@@ -35,9 +37,12 @@ fn main() {
     }
 }
 
-fn get_random_word(_path: &str) -> String {
+fn get_random_word(path: &str) -> String {
     // TODO - Read from text file and pick random line
-    "abcde".to_string()
+    let file = std::fs::read_to_string(path).unwrap();
+    let rng: usize = rand::thread_rng().gen_range(0..file.lines().count());
+    let word = file.lines().nth(rng).unwrap();
+    word.to_string()
 }
 
 fn string_from_flags(_input: String, flags: [usize; 5]) -> String {
